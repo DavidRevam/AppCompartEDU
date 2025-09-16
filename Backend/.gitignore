@@ -1,0 +1,79 @@
+# Node modules
+
+node_modules/
+ 
+# Logs
+
+logs/
+
+*.log
+
+npm-debug.log*
+
+yarn-debug.log*
+
+yarn-error.log*
+ 
+# Runtime data
+
+pids/
+
+*.pid
+
+*.seed
+
+*.pid.lock
+ 
+# TypeScript cache and build output
+
+dist/
+
+build/
+
+*.tsbuildinfo
+ 
+# Environment variables
+
+.env
+
+.env.local
+
+.env.*.local
+ 
+# OS specific
+
+.DS_Store
+
+Thumbs.db
+ 
+# IDEs
+
+.vscode/
+
+.idea/
+ 
+# Coverage reports
+
+coverage/
+
+*.lcov
+ 
+# Optional: Docker artifacts
+
+docker-compose.override.yml
+ 
+# Optional: PM2 process files
+
+.pids/
+
+*.pm2.log
+ 
+# Optional: Next.js build folder (if hybrid)
+
+.next/
+ 
+# Optional: Test coverage from Jest
+
+jest-coverage/
+
+ 
