@@ -53,7 +53,7 @@ router.get("/users/email/:email",async(request,response)=>{
         await userController.searchUserByEmail(request,response);
     } catch (error) {
         console.error(error);
-        response.status(400).json({message:"Error en obtener usuario"});
+        response.status(400).json({message:"Error en obtener usuario por Email"});
     }
 });
 
@@ -62,7 +62,7 @@ router.put("/users/:id",async(request,response)=>{
         await userController.updateUser(request,response);
     } catch (error) {
         console.error(error);
-        response.status(400).json({message:"Error en obtener usuario"});
+        response.status(400).json({message:"Error en obtener usuario por ID"});
     }
 });
 
@@ -71,7 +71,7 @@ router.delete("/users/:id",async(request,response)=>{
         await userController.downUser(request,response);
     } catch (error) {
         console.error(error);
-        response.status(400).json({message:"Error en obtener usuario"});
+        response.status(400).json({message:"Error en obtener usuario y borrar usuario por ID"});
     }
 });
 
