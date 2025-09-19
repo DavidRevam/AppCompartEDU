@@ -2,7 +2,7 @@
 
 import { UserApplication } from "../../application/UserApplication";
 import {User} from "../../domain/User";
-import { Request, response, Response} from "express";
+import { Request, Response} from "express";
 
 
 //Aqui la PETICION
