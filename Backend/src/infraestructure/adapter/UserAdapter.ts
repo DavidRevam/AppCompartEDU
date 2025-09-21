@@ -3,15 +3,18 @@ import { User } from "../../domain/User";
 import { UserPort } from "../../domain/UserPort";
 import { UserEntity } from "../entities/UserEntity";
 import { AppDataSource } from "../config/con_data_base";
+import { PublicacionEntity } from "../entities/PublicacionEntity";
 
 
 //Conectar directamente con el TypeORM(Tener control sobre bd)
 export class UserAdapter implements UserPort{
 
     private userRepository: Repository<UserEntity>;
+    private publicacionRepository: Repository<PublicacionEntity>;
 
     constructor(){
         this.userRepository = AppDataSource.getRepository(UserEntity);
+        this.publicacionRepository = AppDataSource.getRepository(PublicacionEntity);
     }
 
     //Conversion
@@ -82,7 +85,16 @@ export class UserAdapter implements UserPort{
             Object.assign(existingUser,{
                 estado_usu_activo: 0
             });
+
+            existingUser.estado_usu_activo = 0;
             await this.userRepository.save(existingUser);
+
+
+            await this.publicacionRepository.update(
+                { usuario: { id_usuario: id } },
+                { estado_publi_activa: 0 }
+            );
+
             return true;
                 
         }catch (error){

@@ -123,7 +123,8 @@ export class PublicacionController {
       if (isNaN(id_usuario)) {
         return res.status(400).json({ error: "ID de usuario inválido" });
       }
-
+      
+      
       const publicaciones = await this.app.getPublicacionByUserId(id_usuario);
       return res.status(200).json(publicaciones);
     } catch (error) {
