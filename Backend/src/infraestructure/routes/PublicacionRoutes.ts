@@ -4,6 +4,7 @@ import { PublicacionAdapter } from "../adapter/PublicacionAdapter";
 import { PublicacionController } from "../controller/PublicacionController";
 import { UserAdapter } from "../adapter/UserAdapter"; // necesario porque PublicacionApplication recibe también el UserPort
 import { StockAdapter } from "../adapter/StockAdapter"; // necesario porque PublicacionApplication recibe también el StockPort
+import { ImagenAdapter } from "../adapter/ImagenAdapter"; // necesario porque PublicacionApplication recibe también el ImagenPort
 import { authenticateToken } from "../web/authMiddleware";
 
 const router = Router();
@@ -11,7 +12,8 @@ const router = Router();
 const publicacionAdapter = new PublicacionAdapter();
 const userAdapter = new UserAdapter();
 const stockAdapter = new StockAdapter();
-const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapter, stockAdapter);
+const imagenAdapter = new ImagenAdapter();
+const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapter, stockAdapter, imagenAdapter);
 const publicacionController = new PublicacionController(publicacionApp);
 
 // Crear publicación
@@ -21,6 +23,16 @@ router.post("/publicaciones", /*authenticateToken,*/ async (req: Request, res: R
   } catch (error) {
     console.error("(createPublicacion) Error en publicación:", error);
     res.status(400).json({ message: "Error en creación de publicación" });
+  }
+});
+
+// Crear publicación con stock e imágenes
+router.post("/publicaciones/with-images", /*authenticateToken,*/ async (req: Request, res: Response) => {
+  try {
+    await publicacionController.createPublicacionWithImages(req, res);
+  } catch (error) {
+    console.error("(createPublicacionWithImages) Error en publicación con imágenes:", error);
+    res.status(400).json({ message: "Error en creación de publicación con imágenes" });
   }
 });
 
@@ -71,6 +83,26 @@ router.delete("/publicaciones/:id", async (req: Request, res: Response) => {
   } catch (error) {
     console.error("(deletePublicacion) Error en publicación:", error);
     res.status(400).json({ message: "Error en eliminar publicación" });
+  }
+});
+
+// Obtener todas las publicaciones con stock e imágenes
+router.get("/publicaciones/complete/all", async (req: Request, res: Response) => {
+  try {
+    await publicacionController.getAllPublicacionesWithStockAndImages(req, res);
+  } catch (error) {
+    console.error("(getAllPublicacionesWithStockAndImages) Error:", error);
+    res.status(500).json({ message: "Error al obtener publicaciones completas" });
+  }
+});
+
+// Obtener una publicación específica con stock e imágenes
+router.get("/publicaciones/complete/:id", async (req: Request, res: Response) => {
+  try {
+    await publicacionController.getPublicacionWithStockAndImagesById(req, res);
+  } catch (error) {
+    console.error("(getPublicacionWithStockAndImagesById) Error:", error);
+    res.status(500).json({ message: "Error al obtener publicación completa" });
   }
 });
 

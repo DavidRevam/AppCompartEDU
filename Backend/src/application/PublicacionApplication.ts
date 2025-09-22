@@ -4,16 +4,20 @@ import { UserPort } from '../domain/UserPort';
 import { AuthApplication } from "./AuthApplication";
 import { StockPort } from "../domain/StockPort";
 import { Stock } from "../domain/Stock";
+import { ImagenPort } from "../domain/ImagenPort";
+import { Imagen } from "../domain/Imagen";
 
 export class PublicacionApplication{
     private port: PublicacionPort;
     private userPort: UserPort;
     private stockPort: StockPort;
+    private imagenPort: ImagenPort;
 
-    constructor(port: PublicacionPort, userPort: UserPort, stockPort: StockPort) {
+    constructor(port: PublicacionPort, userPort: UserPort, stockPort: StockPort, imagenPort: ImagenPort) {
         this.port = port;
         this.userPort = userPort;
         this.stockPort = stockPort;
+        this.imagenPort = imagenPort;
     }
 
     async createPublicacion(publi: Omit<Publicacion, "id">): Promise<number>{
@@ -49,6 +53,48 @@ export class PublicacionApplication{
         } catch (error) {
             // Si algo falla, podríamos implementar rollback aquí
             throw new Error(`Error al crear publicación con stock: ${error}`);
+        }
+    }
+
+    // Crear publicación con stock e imágenes en una sola operación
+    async createPublicacionWithStockAndImages(
+        publi: Omit<Publicacion, "id">, 
+        stockData: Omit<Stock, "id" | "idPublicacion">,
+        imagenesData: Omit<Imagen, "id" | "idPublicacion">[]
+    ): Promise<{ publicacionId: number; stockId: number; imagenesIds: number[] }> {
+        // Verificar que el usuario existe
+        const existingUser = await this.userPort.getUserById(publi.id_usuario);
+        if (!existingUser) {
+            throw new Error("El usuario asociado no existe");
+        }
+
+        try {
+            // Crear la publicación primero
+            const publicacionId = await this.port.createPublicacion(publi);
+
+            // Crear el stock asociado a la publicación
+            const stockToCreate: Omit<Stock, "id"> = {
+                ...stockData,
+                idPublicacion: publicacionId
+            };
+
+            const stockId = await this.stockPort.createStock(stockToCreate);
+
+            // Crear las imágenes asociadas a la publicación
+            const imagenesIds: number[] = [];
+            for (const imagenData of imagenesData) {
+                const imagenToCreate: Omit<Imagen, "id"> = {
+                    ...imagenData,
+                    idPublicacion: publicacionId
+                };
+                const imagenId = await this.imagenPort.createImagen(imagenToCreate);
+                imagenesIds.push(imagenId);
+            }
+
+            return { publicacionId, stockId, imagenesIds };
+        } catch (error) {
+            // Si algo falla, podríamos implementar rollback aquí
+            throw new Error(`Error al crear publicación con stock e imágenes: ${error}`);
         }
     }
 
@@ -110,6 +156,60 @@ export class PublicacionApplication{
 
         // Ejecutar la actualización a través del puerto
         return this.port.updatePublicacionesByUserId(id_usuario, data);
+    }
+
+    // Obtener todas las publicaciones con stock e imágenes
+    async getAllPublicacionesWithStockAndImages(): Promise<any[]> {
+        try {
+            console.log("📋 Obteniendo todas las publicaciones...");
+            // Obtener todas las publicaciones
+            const publicaciones = await this.port.getAllPublicaciones();
+            console.log(`📊 Publicaciones encontradas: ${publicaciones.length}`);
+            
+            // Para cada publicación, obtener su stock e imágenes
+            const publicacionesCompletas = await Promise.all(
+                publicaciones.map(async (publicacion) => {
+                    console.log(`🔍 Procesando publicación ID: ${publicacion.id}`);
+                    const stock = await this.stockPort.getStockByPublicacionId(publicacion.id);
+                    console.log(`📦 Stock encontrado para publicación ${publicacion.id}:`, stock ? 'SÍ' : 'NO');
+                    const imagenes = await this.imagenPort.getImagenesByPublicacionId(publicacion.id);
+                    console.log(`🖼️ Imágenes encontradas para publicación ${publicacion.id}: ${imagenes ? imagenes.length : 0}`);
+                    
+                    return {
+                        ...publicacion,
+                        stock: stock,
+                        imagenes: imagenes
+                    };
+                })
+            );
+            
+            console.log(`✅ Publicaciones completas procesadas: ${publicacionesCompletas.length}`);
+            return publicacionesCompletas;
+        } catch (error) {
+            console.error("❌ Error en getAllPublicacionesWithStockAndImages:", error);
+            throw new Error(`Error al obtener publicaciones con stock e imágenes: ${error}`);
+        }
+    }
+
+    // Obtener una publicación específica con stock e imágenes
+    async getPublicacionWithStockAndImagesById(id: number): Promise<any | null> {
+        try {
+            const publicacion = await this.port.getPublicacionById(id);
+            if (!publicacion) {
+                return null;
+            }
+            
+            const stock = await this.stockPort.getStockByPublicacionId(publicacion.id);
+            const imagenes = await this.imagenPort.getImagenesByPublicacionId(publicacion.id);
+            
+            return {
+                ...publicacion,
+                stock: stock,
+                imagenes: imagenes
+            };
+        } catch (error) {
+            throw new Error(`Error al obtener publicación con stock e imágenes: ${error}`);
+        }
     }
 
 }

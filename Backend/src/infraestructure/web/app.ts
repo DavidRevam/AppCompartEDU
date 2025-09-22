@@ -2,6 +2,7 @@ import express,{Request, Response} from "express";
 import userRoutes from "../routes/UserRoutes";
 import publicacionRoutes from "../routes/PublicacionRoutes";
 import stockRoutes from "../routes/StockRoutes";
+import imagenRoutes from "../routes/ImagenRoutes";
 import cors from "cors";
 
 class App {
@@ -23,7 +24,8 @@ class App {
     private routes():void{
         this.app.use("/api", userRoutes);
         this.app.use("/api", publicacionRoutes);
-        this.app.use("/api", stockRoutes)
+        this.app.use("/api", stockRoutes);
+        this.app.use("/api/imagenes", imagenRoutes);
     }
 
     getApp(){

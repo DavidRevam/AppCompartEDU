@@ -102,7 +102,9 @@ export class StockAdapter implements StockPort {
 
     async getAllStocks(): Promise<Stock[]> {
         try {
-            const stocks = await this.stockRepository.find();
+            const stocks = await this.stockRepository.find({
+                relations: ['publicacion']
+            });
             return stocks.map(stock => this.toDomain(stock));
         } catch (error) {
             console.error("Error al obtener todos los stocks", error);
@@ -112,7 +114,10 @@ export class StockAdapter implements StockPort {
 
     async getStockById(id: number): Promise<Stock | null> {
         try {
-            const stock = await this.stockRepository.findOne({ where: { id_stock: id } });
+            const stock = await this.stockRepository.findOne({ 
+                where: { id_stock: id },
+                relations: ['publicacion']
+            });
             return stock ? this.toDomain(stock) : null;
         } catch (error) {
             console.error("Error al obtener stock por ID", error);
@@ -122,7 +127,10 @@ export class StockAdapter implements StockPort {
 
     async getStockByPublicacionId(idPublicacion: number): Promise<Stock | null> {
         try {
-            const stock = await this.stockRepository.findOne({ where: { publicacion: { id_publicacion: idPublicacion } } });
+            const stock = await this.stockRepository.findOne({ 
+                where: { publicacion: { id_publicacion: idPublicacion } },
+                relations: ['publicacion']
+            });
             return stock ? this.toDomain(stock) : null;
         } catch (error) {
             console.error("Error al obtener stock por ID de publicación", error);
