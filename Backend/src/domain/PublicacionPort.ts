@@ -7,6 +7,8 @@ export interface PublicacionPort{
     getAllPublicaciones(): Promise<Publicacion[]>;
     getPublicacionById(id: number): Promise<Publicacion | null>;
     getPublicacionByUserId(id_usuario: number): Promise<Publicacion[]>;
+    //Agregado para cambio de todas las publicaciones de un usuario
+    updatePublicacionesByUserId(id_usuario: number, data: Partial<Publicacion>): Promise<boolean>;
 }
 
 

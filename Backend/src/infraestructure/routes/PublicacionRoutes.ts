@@ -3,13 +3,15 @@ import { PublicacionApplication } from "../../application/PublicacionApplication
 import { PublicacionAdapter } from "../adapter/PublicacionAdapter";
 import { PublicacionController } from "../controller/PublicacionController";
 import { UserAdapter } from "../adapter/UserAdapter"; // necesario porque PublicacionApplication recibe también el UserPort
+import { StockAdapter } from "../adapter/StockAdapter"; // necesario porque PublicacionApplication recibe también el StockPort
 import { authenticateToken } from "../web/authMiddleware";
 
 const router = Router();
 
 const publicacionAdapter = new PublicacionAdapter();
 const userAdapter = new UserAdapter();
-const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapter);
+const stockAdapter = new StockAdapter();
+const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapter, stockAdapter);
 const publicacionController = new PublicacionController(publicacionApp);
 
 // Crear publicación

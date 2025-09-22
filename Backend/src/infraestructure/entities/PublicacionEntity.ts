@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
 import { UserEntity } from "./UserEntity";
+import { StockEntity } from "./StockEntity";
 
 @Entity({ name: "publicaciones", schema: "compartedu" })
 export class PublicacionEntity {
@@ -22,4 +23,7 @@ export class PublicacionEntity {
     @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_usuario" })  // FK
     usuario!: UserEntity;
+
+    @OneToOne(() => StockEntity, (stock) => stock.publicacion)
+    stock!: StockEntity;
 }

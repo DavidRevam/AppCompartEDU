@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import {UserEntity} from "../entities/UserEntity";
 import { PublicacionEntity } from "../entities/PublicacionEntity";
+import { StockEntity } from "../entities/StockEntity";
 import envs from "../config/enviroment-vars";
 
 
@@ -16,7 +17,7 @@ export const AppDataSource = new DataSource({
     schema: envs.DB_SCHEMA,
     synchronize: true,
     logging: true,
-    entities:[UserEntity, PublicacionEntity],
+    entities:[UserEntity, PublicacionEntity, StockEntity],
 });
 
 //Conectar a la base de Datos

@@ -77,30 +77,9 @@ export class UserAdapter implements UserPort{
         }
     }
     async deleteUser(id: number): Promise<boolean> {
-        try{
-            const existingUser = await this.userRepository.findOne({where:{id_usuario: id}});
-            if(!existingUser){
-                throw new Error("Usuario no encontrado")
-            }
-            Object.assign(existingUser,{
-                estado_usu_activo: 0
-            });
-
-            existingUser.estado_usu_activo = 0;
-            await this.userRepository.save(existingUser);
-
-
-            await this.publicacionRepository.update(
-                { usuario: { id_usuario: id } },
-                { estado_publi_activa: 0 }
-            );
-
-            return true;
-                
-        }catch (error){
-            console.error("Error al eliminar usuario", error);
-            throw new Error("Error al eliminar usuario");
-        }
+        // 🔧 SOLO PERSISTENCIA: Usar updateUser genérico para mantener consistencia
+        // La lógica de negocio (decidir que eliminar = estado_usu_activo = 0) está en Application
+        return this.updateUser(id, { usuario_activo: 0 });
     }
 
     //Consultas

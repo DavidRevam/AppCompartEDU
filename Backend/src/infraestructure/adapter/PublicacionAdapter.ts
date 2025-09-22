@@ -105,7 +105,7 @@ export class PublicacionAdapter implements PublicacionPort {
 
     async getPublicacionById(id: number): Promise<Publicacion | null> {
         try {
-            const publicacion = await this.publicacionRepository.findOne({ where:{ id_publicacion: id }, relations: ["usuario"]});
+            const publicacion = await this.publicacionRepository.findOne({ where: { id_publicacion: id }, relations: ["usuario"] });
             return publicacion ? this.toDomain(publicacion) : null;
         } catch (error) {
             console.error("Error al obtener la publicacion por id", error);
@@ -115,15 +115,30 @@ export class PublicacionAdapter implements PublicacionPort {
 
     async getPublicacionByUserId(id_usuario: number): Promise<Publicacion[]> {
         try {
-        const publicaciones = await this.publicacionRepository.find({
-            where: {usuario: { id_usuario }}, relations: ["usuario"]});
+            const publicaciones = await this.publicacionRepository.find({
+                where: { usuario: { id_usuario } }, relations: ["usuario"]
+            });
 
-        return publicaciones.map(this.toDomain);
-    } catch (error) {
-        console.error("Error al obtener publicaciones por usuario", error);
-        throw new Error("Error al obtener publicaciones por usuario");
+            return publicaciones.map(this.toDomain);
+        } catch (error) {
+            console.error("Error al obtener publicaciones por usuario", error);
+            throw new Error("Error al obtener publicaciones por usuario");
+        }
     }
+
+    async updatePublicacionesByUserId(id_usuario: number, data: Partial<Publicacion>): Promise<boolean> {
+        try {
+            await this.publicacionRepository.update(
+                { usuario: { id_usuario } }, // condición WHERE
+                { estado_publi_activa: data.publicacion_activo } // valores a actualizar
+            );
+            return true;
+        } catch (error) {
+            console.error("Error al actualizar publicaciones por usuario", error);
+            throw new Error("Error al actualizar publicaciones por usuario");
+        }
     }
+
 
 
 }

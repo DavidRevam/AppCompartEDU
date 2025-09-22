@@ -1,6 +1,7 @@
 import { Router, response } from 'express';
 import { UserApplication } from "../../application/UserApplication";
 import { UserAdapter } from "../adapter/UserAdapter";
+import { PublicacionAdapter } from "../adapter/PublicacionAdapter";
 import { UserController } from "../controller/UserController"
 import { authenticateToken } from '../web/authMiddleware';
 
@@ -9,7 +10,8 @@ const router = Router();
 
 //INICIALIZACION DE CAPAS EN ORDEN
 const userAdapter = new UserAdapter();
-const userApp = new UserApplication(userAdapter);
+const publicacionAdapter = new PublicacionAdapter();
+const userApp = new UserApplication(userAdapter, publicacionAdapter);
 const userController = new UserController(userApp);
 
 //Definicion Rutas. --> ENdpoint ->Especificacion URL
