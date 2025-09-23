@@ -3,6 +3,8 @@ import userRoutes from "../routes/UserRoutes";
 import publicacionRoutes from "../routes/PublicacionRoutes";
 import stockRoutes from "../routes/StockRoutes";
 import imagenRoutes from "../routes/ImagenRoutes";
+import solicitudRoutes from "../routes/SolicitudRoutes";
+import estadoSolicitudRoutes from "../routes/EstadoSolicitudRoutes";
 import cors from "cors";
 
 class App {
@@ -26,6 +28,8 @@ class App {
         this.app.use("/api", publicacionRoutes);
         this.app.use("/api", stockRoutes);
         this.app.use("/api/imagenes", imagenRoutes);
+        this.app.use("/api/solicitudes", solicitudRoutes);
+        this.app.use("/api/estados-solicitud", estadoSolicitudRoutes);
     }
 
     getApp(){

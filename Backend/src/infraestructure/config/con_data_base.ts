@@ -3,6 +3,8 @@ import {UserEntity} from "../entities/UserEntity";
 import { PublicacionEntity } from "../entities/PublicacionEntity";
 import { StockEntity } from "../entities/StockEntity";
 import { ImagenEntity } from "../entities/ImagenEntity";
+import { SolicitudEntity } from "../entities/SolicitudEntity";
+import { EstadoSolicitudEntity } from "../entities/EstadoSolicitudEntity";
 import envs from "../config/enviroment-vars";
 
 
@@ -18,7 +20,7 @@ export const AppDataSource = new DataSource({
     schema: envs.DB_SCHEMA,
     synchronize: true,
     logging: true,
-    entities:[UserEntity, PublicacionEntity, StockEntity, ImagenEntity],
+    entities:[UserEntity, PublicacionEntity, StockEntity, ImagenEntity, SolicitudEntity, EstadoSolicitudEntity],
 });
 
 //Conectar a la base de Datos

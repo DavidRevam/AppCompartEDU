@@ -20,41 +20,7 @@ export class PublicacionApplication{
         this.imagenPort = imagenPort;
     }
 
-    async createPublicacion(publi: Omit<Publicacion, "id">): Promise<number>{
-        //Existe el usuario?
-        const existingUser = await this.userPort.getUserById(publi.id_usuario);
-        if(!existingUser){
-            throw new Error("El usuario asociado no existe");
-        }
-        return this.port.createPublicacion(publi);
-    }
 
-    // Crear publicación con su stock asociado
-    async createPublicacionWithStock(publi: Omit<Publicacion, "id">, stockData: Omit<Stock, "id" | "idPublicacion">): Promise<{ publicacionId: number; stockId: number }> {
-        // Verificar que el usuario existe
-        const existingUser = await this.userPort.getUserById(publi.id_usuario);
-        if (!existingUser) {
-            throw new Error("El usuario asociado no existe");
-        }
-
-        try {
-            // Crear la publicación primero
-            const publicacionId = await this.port.createPublicacion(publi);
-
-            // Crear el stock asociado a la publicación
-            const stockToCreate: Omit<Stock, "id"> = {
-                ...stockData,
-                idPublicacion: publicacionId
-            };
-
-            const stockId = await this.stockPort.createStock(stockToCreate);
-
-            return { publicacionId, stockId };
-        } catch (error) {
-            // Si algo falla, podríamos implementar rollback aquí
-            throw new Error(`Error al crear publicación con stock: ${error}`);
-        }
-    }
 
     // Crear publicación con stock e imágenes en una sola operación
     async createPublicacionWithStockAndImages(
@@ -161,19 +127,17 @@ export class PublicacionApplication{
     // Obtener todas las publicaciones con stock e imágenes
     async getAllPublicacionesWithStockAndImages(): Promise<any[]> {
         try {
-            console.log("📋 Obteniendo todas las publicaciones...");
             // Obtener todas las publicaciones
             const publicaciones = await this.port.getAllPublicaciones();
-            console.log(`📊 Publicaciones encontradas: ${publicaciones.length}`);
             
             // Para cada publicación, obtener su stock e imágenes
             const publicacionesCompletas = await Promise.all(
                 publicaciones.map(async (publicacion) => {
-                    console.log(`🔍 Procesando publicación ID: ${publicacion.id}`);
+                    
                     const stock = await this.stockPort.getStockByPublicacionId(publicacion.id);
-                    console.log(`📦 Stock encontrado para publicación ${publicacion.id}:`, stock ? 'SÍ' : 'NO');
+                    
                     const imagenes = await this.imagenPort.getImagenesByPublicacionId(publicacion.id);
-                    console.log(`🖼️ Imágenes encontradas para publicación ${publicacion.id}: ${imagenes ? imagenes.length : 0}`);
+                    
                     
                     return {
                         ...publicacion,
@@ -183,10 +147,8 @@ export class PublicacionApplication{
                 })
             );
             
-            console.log(`✅ Publicaciones completas procesadas: ${publicacionesCompletas.length}`);
             return publicacionesCompletas;
         } catch (error) {
-            console.error("❌ Error en getAllPublicacionesWithStockAndImages:", error);
             throw new Error(`Error al obtener publicaciones con stock e imágenes: ${error}`);
         }
     }

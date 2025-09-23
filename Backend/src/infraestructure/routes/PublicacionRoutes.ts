@@ -16,23 +16,13 @@ const imagenAdapter = new ImagenAdapter();
 const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapter, stockAdapter, imagenAdapter);
 const publicacionController = new PublicacionController(publicacionApp);
 
-// Crear publicación
+// Crear publicación (siempre con stock e imágenes)
 router.post("/publicaciones", /*authenticateToken,*/ async (req: Request, res: Response) => {
   try {
     await publicacionController.createPublicacion(req, res);
   } catch (error) {
     console.error("(createPublicacion) Error en publicación:", error);
     res.status(400).json({ message: "Error en creación de publicación" });
-  }
-});
-
-// Crear publicación con stock e imágenes
-router.post("/publicaciones/with-images", /*authenticateToken,*/ async (req: Request, res: Response) => {
-  try {
-    await publicacionController.createPublicacionWithImages(req, res);
-  } catch (error) {
-    console.error("(createPublicacionWithImages) Error en publicación con imágenes:", error);
-    res.status(400).json({ message: "Error en creación de publicación con imágenes" });
   }
 });
 
