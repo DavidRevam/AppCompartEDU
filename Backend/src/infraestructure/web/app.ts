@@ -1,9 +1,10 @@
 import express,{Request, Response} from "express";
 import userRoutes from "../routes/UserRoutes";
 import publicacionRoutes from "../routes/PublicacionRoutes";
+import solicitudRoutes from "../routes/SolicitudRoutes";
 import stockRoutes from "../routes/StockRoutes";
 import imagenRoutes from "../routes/ImagenRoutes";
-import solicitudRoutes from "../routes/SolicitudRoutes";
+import envioRoutes from "../routes/EnvioRoutes";
 import estadoSolicitudRoutes from "../routes/EstadoSolicitudRoutes";
 import cors from "cors";
 
@@ -30,6 +31,7 @@ class App {
         this.app.use("/api/imagenes", imagenRoutes);
         this.app.use("/api/solicitudes", solicitudRoutes);
         this.app.use("/api/estados-solicitud", estadoSolicitudRoutes);
+        this.app.use("/api/envios", envioRoutes);
     }
 
     getApp(){

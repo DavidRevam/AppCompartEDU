@@ -11,7 +11,22 @@ const estadoSolicitudApplication = new EstadoSolicitudApplication(estadoSolicitu
 const estadoSolicitudController = new EstadoSolicitudController(estadoSolicitudApplication);
 
 // Rutas para estados de solicitud
-router.get("/", (req, res) => estadoSolicitudController.getAllEstadosSolicitud(req, res));
-router.get("/:id", (req, res) => estadoSolicitudController.getEstadoSolicitudById(req, res));
+router.get("/", async (req, res) => {
+    try {
+        await estadoSolicitudController.getAllEstadosSolicitud(req, res);
+    } catch (error) {
+        console.error("Error en obtener estados de solicitud:", error);
+        res.status(400).json({ message: "Error en obtener estados de solicitud" });
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    try {
+        await estadoSolicitudController.getEstadoSolicitudById(req, res);
+    } catch (error) {
+        console.error("Error en obtener estado de solicitud:", error);
+        res.status(400).json({ message: "Error en obtener estado de solicitud" });
+    }
+});
 
 export default router;

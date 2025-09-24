@@ -83,11 +83,14 @@ export class SolicitudAdapter implements SolicitudPort {
 
     async deleteSolicitud(id: number): Promise<boolean> {
         try {
-            const result = await this.solicitudRepository.delete(id);
+            // Eliminado lógico: cambiar estado a "Cancelada" (id = 4)
+            const result = await this.solicitudRepository.update(id, {
+                estadoSolicitud: { id_estado_solicitud: 4 } // Estado "Cancelada"
+            });
             return (result.affected ?? 0) > 0;
         } catch (error) {
-            console.error("Error al eliminar solicitud", error);
-            throw new Error("Error al eliminar solicitud");
+            console.error("Error al cancelar solicitud", error);
+            throw new Error("Error al cancelar solicitud");
         }
     }
 

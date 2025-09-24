@@ -52,6 +52,7 @@ export class SolicitudApplication {
         }
     }
 
+    // Eliminado lógico: cambia el estado de la solicitud a "Cancelada"
     async deleteSolicitud(id: number): Promise<boolean> {
         try {
             if (id <= 0) {
@@ -60,7 +61,7 @@ export class SolicitudApplication {
 
             return await this.solicitudPort.deleteSolicitud(id);
         } catch (error) {
-            console.error("Error en aplicación al eliminar solicitud", error);
+            console.error("Error en aplicación al cancelar solicitud", error);
             throw error;
         }
     }
