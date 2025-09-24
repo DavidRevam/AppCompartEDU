@@ -15,7 +15,7 @@ const stockController = new StockController(stockApp);
 //Definicion Rutas. --> ENdpoint ->Especificacion URL
 
 // Crear stock
-router.post("/stocks", /*authenticateToken,*/ async(request, response) => {
+router.post("/stocks", authenticateToken, async(request, response) => {
     try {
         await stockController.createStock(request, response);
     } catch (error) {
@@ -55,7 +55,7 @@ router.get("/stocks/publicacion/:idPublicacion", async(request, response) => {
 });
 
 // Actualizar stock
-router.put("/stocks/:id", async(request, response) => {
+router.put("/stocks/:id", authenticateToken, async(request, response) => {
     try {
         await stockController.updateStock(request, response);
     } catch (error) {
@@ -64,8 +64,8 @@ router.put("/stocks/:id", async(request, response) => {
     }
 });
 
-// Eliminación lógica de stock (siguiendo el patrón de UserRoutes)
-router.delete("/stocks/:id", async(request, response) => {
+// Eliminación lógica de stock
+router.delete("/stocks/:id", authenticateToken, async(request, response) => {
     try {
         await stockController.downStock(request, response);
     } catch (error) {

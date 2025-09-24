@@ -195,7 +195,7 @@ export class UserController{
 
     } catch (error) {
       if (error instanceof Error) {
-        return response.status(500).json({ message: "Error en servidor" });
+        return response.status(500).json({ message: "Error en servidor", error: error.message });
       }
     }
     return response.status(400).json({ message: "Error en la peticion" });

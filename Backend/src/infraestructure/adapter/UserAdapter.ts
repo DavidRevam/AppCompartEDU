@@ -76,9 +76,8 @@ export class UserAdapter implements UserPort{
             throw new Error("Error al actualizar usuario");
         }
     }
+    
     async deleteUser(id: number): Promise<boolean> {
-        // 🔧 SOLO PERSISTENCIA: Usar updateUser genérico para mantener consistencia
-        // La lógica de negocio (decidir que eliminar = estado_usu_activo = 0) está en Application
         return this.updateUser(id, { usuario_activo: 0 });
     }
 

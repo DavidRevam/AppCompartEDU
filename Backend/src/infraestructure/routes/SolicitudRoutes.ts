@@ -2,6 +2,7 @@ import { Router } from "express";
 import { SolicitudController } from "../controller/SolicitudController";
 import { SolicitudApplication } from "../../application/SolicitudApplication";
 import { SolicitudAdapter } from "../adapter/SolicitudAdapter";
+import { authenticateToken } from "../web/authMiddleware";
 
 const router = Router();
 
@@ -10,8 +11,8 @@ const solicitudAdapter = new SolicitudAdapter();
 const solicitudApplication = new SolicitudApplication(solicitudAdapter);
 const solicitudController = new SolicitudController(solicitudApplication);
 
-// Rutas CRUD básicas
-router.post("/", async (req, res) => {
+// Crear Solicitud
+router.post("/", authenticateToken, async (req, res) => {
     try {
         await solicitudController.createSolicitud(req, res);
     } catch (error) {
@@ -20,7 +21,9 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:id", async (req, res) => {
+
+// Actualizar Solicitud 
+router.put("/:id", authenticateToken, async (req, res) => {
     try {
         await solicitudController.updateSolicitud(req, res);
     } catch (error) {
@@ -29,7 +32,8 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+// Eliminar Solicitud
+router.delete("/:id", authenticateToken, async (req, res) => {
     try {
         await solicitudController.deleteSolicitud(req, res);
     } catch (error) {
@@ -38,6 +42,7 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// Obtener todas las Solicitudes
 router.get("/", async (req, res) => {
     try {
         await solicitudController.getAllSolicitudes(req, res);
@@ -47,6 +52,7 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Obtener Solicitud por ID
 router.get("/:id", async (req, res) => {
     try {
         await solicitudController.getSolicitudById(req, res);
@@ -56,7 +62,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// Rutas específicas por filtros
+// Obtener Solicitudes x Usuario
 router.get("/usuario/:id_usuario", async (req, res) => {
     try {
         await solicitudController.getSolicitudesByUsuario(req, res);
@@ -66,6 +72,7 @@ router.get("/usuario/:id_usuario", async (req, res) => {
     }
 });
 
+// Obtener Solicitudes x Publicación
 router.get("/publicacion/:id_publicacion", async (req, res) => {
     try {
         await solicitudController.getSolicitudesByPublicacion(req, res);
@@ -75,6 +82,7 @@ router.get("/publicacion/:id_publicacion", async (req, res) => {
     }
 });
 
+// Obtener Solicitudes x Estado
 router.get("/estado/:id_estado", async (req, res) => {
     try {
         await solicitudController.getSolicitudesByEstado(req, res);
@@ -84,8 +92,9 @@ router.get("/estado/:id_estado", async (req, res) => {
     }
 });
 
+
 // Rutas para cambio de estado
-router.patch("/:id/estado", async (req, res) => {
+router.patch("/:id/estado", authenticateToken, async (req, res) => {
     try {
         await solicitudController.cambiarEstadoSolicitud(req, res);
     } catch (error) {
@@ -94,7 +103,7 @@ router.patch("/:id/estado", async (req, res) => {
     }
 });
 
-router.patch("/:id/aceptar", async (req, res) => {
+router.patch("/:id/aceptar", authenticateToken, async (req, res) => {
     try {
         await solicitudController.aceptarSolicitud(req, res);
     } catch (error) {
@@ -103,7 +112,7 @@ router.patch("/:id/aceptar", async (req, res) => {
     }
 });
 
-router.patch("/:id/rechazar", async (req, res) => {
+router.patch("/:id/rechazar", authenticateToken, async (req, res) => {
     try {
         await solicitudController.rechazarSolicitud(req, res);
     } catch (error) {
@@ -112,7 +121,7 @@ router.patch("/:id/rechazar", async (req, res) => {
     }
 });
 
-router.patch("/:id/cancelar", async (req, res) => {
+router.patch("/:id/cancelar", authenticateToken, async (req, res) => {
     try {
         await solicitudController.cancelarSolicitud(req, res);
     } catch (error) {

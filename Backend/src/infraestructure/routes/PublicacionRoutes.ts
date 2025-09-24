@@ -17,7 +17,7 @@ const publicacionApp = new PublicacionApplication(publicacionAdapter, userAdapte
 const publicacionController = new PublicacionController(publicacionApp);
 
 // Crear publicación (siempre con stock e imágenes)
-router.post("/publicaciones", /*authenticateToken,*/ async (req: Request, res: Response) => {
+router.post("/publicaciones", authenticateToken, async (req: Request, res: Response) => {
   try {
     await publicacionController.createPublicacion(req, res);
   } catch (error) {
@@ -57,7 +57,7 @@ router.get("/publicaciones/usuario/:id_usuario", async (req: Request, res: Respo
 });
 
 // Actualizar publicación
-router.put("/publicaciones/:id", async (req: Request, res: Response) => {
+router.put("/publicaciones/:id", authenticateToken, async (req: Request, res: Response) => {
   try {
     await publicacionController.updatePublicacion(req, res);
   } catch (error) {
@@ -67,7 +67,7 @@ router.put("/publicaciones/:id", async (req: Request, res: Response) => {
 });
 
 //"BORRADO LOGICO"
-router.delete("/publicaciones/:id", async (req: Request, res: Response) => {
+router.delete("/publicaciones/:id", authenticateToken, async (req: Request, res: Response) => {
   try {
     await publicacionController.deletePublicacion(req, res);
   } catch (error) {

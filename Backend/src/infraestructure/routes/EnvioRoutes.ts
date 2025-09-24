@@ -10,7 +10,7 @@ const envioAdapter = new EnvioAdapter();
 const envioApplication = new EnvioApplication(envioAdapter);
 const envioController = new EnvioController(envioApplication);
 
-// Rutas
+// Crear Envio
 router.post("/", async (req, res) => {
     try {
         await envioController.createEnvio(req, res);
@@ -20,6 +20,7 @@ router.post("/", async (req, res) => {
     }
 });
 
+// Actualizar Envio
 router.put("/:id", async (req, res) => {
     try {
         await envioController.updateEnvio(req, res);
@@ -29,6 +30,7 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+//Eliminar Envio
 router.delete("/:id", async (req, res) => {
     try {
         await envioController.deleteEnvio(req, res);
@@ -38,6 +40,7 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// Obtener todos los Envios
 router.get("/", async (req, res) => {
     try {
         await envioController.getAllEnvios(req, res);
@@ -47,6 +50,7 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Obtener Envio por ID
 router.get("/:id", async (req, res) => {
     try {
         await envioController.getEnvioById(req, res);
@@ -56,6 +60,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// Obtener Envio por Solicitud ID
 router.get("/solicitud/:solicitudId", async (req, res) => {
     try {
         await envioController.getEnvioBySolicitudId(req, res);

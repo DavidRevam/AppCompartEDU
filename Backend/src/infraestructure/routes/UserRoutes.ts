@@ -22,7 +22,7 @@ router.post("/login", async(request, response)=>{
     await userController.login(request, response);
 });
 
-//Primer endpoint
+//Primer endpoint Registrar Usuario
 router.post("/users", /*authenticateToken,*/ async(request, response)=>{
     try{
         await userController.registerUser(request, response);
@@ -32,6 +32,7 @@ router.post("/users", /*authenticateToken,*/ async(request, response)=>{
     }
 });
 
+//Obtener todos los usuarios
 router.get("/users", async(request, response)=>{
     try{
         await userController.allUsers(request, response);
@@ -41,6 +42,8 @@ router.get("/users", async(request, response)=>{
     }
 });
 
+
+//Obtener un usuario por ID
 router.get("/users/:id",async(request,response)=>{
     try {
         await userController.searchUserById(request,response);
@@ -50,6 +53,7 @@ router.get("/users/:id",async(request,response)=>{
     }
 });
 
+//Obtener un usuario por Email
 router.get("/users/email/:email",async(request,response)=>{
     try {
         await userController.searchUserByEmail(request,response);
@@ -59,7 +63,8 @@ router.get("/users/email/:email",async(request,response)=>{
     }
 });
 
-router.put("/users/:id",async(request,response)=>{
+//Actualizar un usuario por ID
+router.put("/users/:id", authenticateToken, async(request,response)=>{
     try {
         await userController.updateUser(request,response);
     } catch (error) {
@@ -68,7 +73,8 @@ router.put("/users/:id",async(request,response)=>{
     }
 });
 
-router.delete("/users/:id",async(request,response)=>{
+//Eliminacion
+router.delete("/users/:id", authenticateToken, async(request,response)=>{
     try {
         await userController.downUser(request,response);
     } catch (error) {
