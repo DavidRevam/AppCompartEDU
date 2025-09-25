@@ -144,7 +144,7 @@ export class PublicacionApplication{
         return this.port.updatePublicacionesByUserId(id_usuario, data);
     }
 
-    // Obtener todas las publicaciones con stock e imágenes
+    // Obtener todas las publicaciones con stock e imágenes (solo las que tienen stock disponible)
     async getAllPublicacionesWithStockAndImages(): Promise<any[]> {
         try {
             // Obtener todas las publicaciones
@@ -167,7 +167,12 @@ export class PublicacionApplication{
                 })
             );
             
-            return publicacionesCompletas;
+            // Filtrar solo las publicaciones que tienen stock disponible mayor a 0
+            const publicacionesConStock = publicacionesCompletas.filter(publicacion => 
+                publicacion.stock && publicacion.stock.cantidadDisponible > 0
+            );
+            
+            return publicacionesConStock;
         } catch (error) {
             throw new Error(`Error al obtener publicaciones con stock e imágenes: ${error}`);
         }

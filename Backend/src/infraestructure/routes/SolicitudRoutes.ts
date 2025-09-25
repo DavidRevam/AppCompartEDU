@@ -2,13 +2,17 @@ import { Router } from "express";
 import { SolicitudController } from "../controller/SolicitudController";
 import { SolicitudApplication } from "../../application/SolicitudApplication";
 import { SolicitudAdapter } from "../adapter/SolicitudAdapter";
+import { StockAdapter } from "../adapter/StockAdapter";
+import { PublicacionAdapter } from "../adapter/PublicacionAdapter";
 import { authenticateToken } from "../web/authMiddleware";
 
 const router = Router();
 
 // Configuración de dependencias
 const solicitudAdapter = new SolicitudAdapter();
-const solicitudApplication = new SolicitudApplication(solicitudAdapter);
+const stockAdapter = new StockAdapter();
+const publicacionAdapter = new PublicacionAdapter();
+const solicitudApplication = new SolicitudApplication(solicitudAdapter, stockAdapter, publicacionAdapter);
 const solicitudController = new SolicitudController(solicitudApplication);
 
 // Crear Solicitud
@@ -89,6 +93,16 @@ router.get("/estado/:id_estado", async (req, res) => {
     } catch (error) {
         console.error("Error en obtener solicitudes por estado:", error);
         res.status(400).json({ message: "Error en obtener solicitudes por estado" });
+    }
+});
+
+// Obtener Solicitudes hechas a publicaciones del usuario
+router.get("/mis-publicaciones/:id_usuario", authenticateToken, async (req, res) => {
+    try {
+        await solicitudController.getSolicitudesByPublicacionesDelUsuario(req, res);
+    } catch (error) {
+        console.error("Error en obtener solicitudes por publicaciones del usuario:", error);
+        res.status(400).json({ message: "Error en obtener solicitudes por publicaciones del usuario" });
     }
 });
 

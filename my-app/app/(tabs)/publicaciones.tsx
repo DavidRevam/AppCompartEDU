@@ -130,7 +130,7 @@ export default function PublicacionesScreen() {
   };
 
   const getSolicitudesParaPublicacion = (publicacionId: number) => {
-    return solicitudesRecibidas.filter(solicitud => solicitud.publicacion.id === publicacionId);
+    return solicitudesRecibidas.filter(solicitud => solicitud.publicacion?.id === publicacionId);
   };
 
   const handleResponderSolicitud = (solicitud: Solicitud, respuesta: 'aceptada' | 'rechazada') => {
@@ -179,7 +179,7 @@ export default function PublicacionesScreen() {
 
     try {
       await SolicitudService.createSolicitud({
-        cantidad_solicitud: cantidad,
+        cantidad: cantidad,
         id_usuario: user.id,
         id_publicacion: selectedPublicacion.id,
       });
@@ -374,10 +374,10 @@ export default function PublicacionesScreen() {
                 <View key={solicitud.id} style={styles.solicitudCard}>
                   <View style={styles.solicitudHeader}>
                     <Text style={styles.solicitudUsuario}>
-                      {solicitud.usuario.nombre} {solicitud.usuario.apellido}
+                      {solicitud.usuario?.nombre || 'N/A'} {solicitud.usuario?.apellido || ''}
                     </Text>
                     <Text style={styles.solicitudFecha}>
-                      {new Date(solicitud.fechaSolicitud).toLocaleDateString()}
+                      {solicitud.fechaSolicitud ? new Date(solicitud.fechaSolicitud).toLocaleDateString() : 'Fecha no disponible'}
                     </Text>
                   </View>
                   
@@ -386,10 +386,10 @@ export default function PublicacionesScreen() {
                   </Text>
                   
                   <Text style={styles.solicitudEstado}>
-                    Estado: {solicitud.estadoSolicitud.descripcionEstado}
+                    Estado: {solicitud.estadoSolicitud?.descripcion || 'Estado desconocido'}
                   </Text>
 
-                  {solicitud.estadoSolicitud.descripcionEstado.toLowerCase() === 'pendiente' && (
+                  {solicitud.estadoSolicitud?.descripcion?.toLowerCase() === 'pendiente' && (
                     <View style={styles.solicitudActions}>
                       <TouchableOpacity
                         style={[styles.solicitudButton, styles.aceptarButton]}

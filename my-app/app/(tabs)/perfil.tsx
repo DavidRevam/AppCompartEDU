@@ -10,12 +10,15 @@ import {
   Platform,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { PublicacionService } from '@/services/publicacionService';
 import { SolicitudService } from '@/services/solicitudService';
-import { Publicacion, Solicitud } from '@/types';
+import { PublicacionService } from '@/services/publicacionService';
+import { UserService } from '@/services/userService';
+import { Solicitud, Publicacion } from '@/types';
+import { useRouter } from 'expo-router';
 
 export default function PerfilScreen() {
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout } = useAuth();
+  const router = useRouter();
   const [misPublicaciones, setMisPublicaciones] = useState<Publicacion[]>([]);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState<Solicitud[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,18 +33,24 @@ export default function PerfilScreen() {
       const publicaciones = await PublicacionService.getPublicacionesByUser(user.id);
       setMisPublicaciones(publicaciones);
 
-      // Cargar solicitudes recibidas en mis publicaciones
-      const todasSolicitudes: Solicitud[] = [];
-      for (const publicacion of publicaciones) {
-        try {
-          const solicitudes = await SolicitudService.getSolicitudesByPublicacion(publicacion.id);
-          todasSolicitudes.push(...solicitudes);
-        } catch (error) {
-          // Continuar si hay error en una publicación específica
-          console.error(`Error al cargar solicitudes para publicación ${publicacion.id}:`, error);
-        }
-      }
-      setSolicitudesRecibidas(todasSolicitudes);
+      // Cargar solicitudes recibidas en mis publicaciones usando el endpoint correcto
+      const solicitudesBasicas = await SolicitudService.getSolicitudesByPublicacionesDelUsuario(user.id);
+      
+      // Las solicitudes ya vienen enriquecidas desde el backend
+      const solicitudesEnriquecidas = solicitudesBasicas.map(solicitud => ({
+        ...solicitud,
+        cantidadSolicitud: solicitud.cantidad,
+        fechaSolicitud: solicitud.fecha,
+        // Los datos de usuario, publicación y estado ya vienen del backend
+        // Solo necesitamos asegurar que la publicación tenga la información correcta
+        publicacion: solicitud.publicacion ? {
+          ...solicitud.publicacion,
+          // Buscar la publicación completa en nuestro array local para obtener stock e imágenes
+          ...publicaciones.find(p => p.id === solicitud.id_publicacion)
+        } : undefined
+      }));
+
+      setSolicitudesRecibidas(solicitudesEnriquecidas);
 
     } catch (error: any) {
       console.error('Error al cargar datos del perfil:', error);
@@ -131,8 +140,45 @@ export default function PerfilScreen() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    if (!user) return;
+
+    const confirmDelete = async () => {
+      try {
+        setIsLoading(true);
+        await UserService.deleteUser(user.id);
+        Alert.alert('Cuenta eliminada', 'Tu cuenta ha sido eliminada correctamente');
+        logout();
+      } catch (error: any) {
+        Alert.alert('Error', error.message || 'Error al eliminar cuenta');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');
+      if (confirmed) {
+        confirmDelete();
+      }
+    } else {
+      Alert.alert(
+        'Eliminar Cuenta',
+        '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Eliminar', 
+            style: 'destructive',
+            onPress: confirmDelete
+          },
+        ]
+      );
+    }
+  };
+
   const solicitudesPendientes = solicitudesRecibidas.filter(
-    s => s.estadoSolicitud.descripcionEstado.toLowerCase() === 'pendiente'
+    s => s.estadoSolicitud && s.estadoSolicitud.descripcion && s.estadoSolicitud.descripcion.toLowerCase() === 'pendiente'
   );
 
   return (
@@ -174,28 +220,31 @@ export default function PerfilScreen() {
           {solicitudesPendientes.map((solicitud) => (
             <View key={solicitud.id} style={styles.solicitudCard}>
               <Text style={styles.solicitudTitle}>
-                {solicitud.publicacion.titulo}
+                {solicitud.publicacion?.titulo || 'Título no disponible'}
               </Text>
               <Text style={styles.solicitudInfo}>
-                  Solicitante: {solicitud.usuario.nombre} {solicitud.usuario.apellido}
+                  Solicitante: {solicitud.usuario?.nombre || 'N/A'} {solicitud.usuario?.apellido || ''}
                 </Text>
+              <Text style={styles.solicitudInfo}>
+                Email: {solicitud.usuario?.email || 'Email no disponible'}
+              </Text>
               <Text style={styles.solicitudInfo}>
                 Cantidad: {solicitud.cantidadSolicitud}
               </Text>
               <Text style={styles.solicitudInfo}>
-                Fecha: {new Date(solicitud.fechaSolicitud).toLocaleDateString()}
+                Fecha: {solicitud.fechaSolicitud ? new Date(solicitud.fechaSolicitud).toLocaleDateString() : 'Fecha no disponible'}
               </Text>
 
               <View style={styles.solicitudActions}>
                 <TouchableOpacity
                   style={styles.acceptButton}
-                  onPress={() => confirmarAccion('aceptar', solicitud.id, solicitud.publicacion.titulo)}
+                  onPress={() => confirmarAccion('aceptar', solicitud.id, solicitud.publicacion?.titulo || 'Título no disponible')}
                 >
                   <Text style={styles.acceptButtonText}>Aceptar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.rejectButton}
-                  onPress={() => confirmarAccion('rechazar', solicitud.id, solicitud.publicacion.titulo)}
+                  onPress={() => confirmarAccion('rechazar', solicitud.id, solicitud.publicacion?.titulo || 'Título no disponible')}
                 >
                   <Text style={styles.rejectButtonText}>Rechazar</Text>
                 </TouchableOpacity>
@@ -232,8 +281,12 @@ export default function PerfilScreen() {
 
       {/* Opciones */}
       <View style={styles.section}>
-        <TouchableOpacity style={styles.optionButton} onPress={refreshUser}>
-          <Text style={styles.optionButtonText}>Actualizar Perfil</Text>
+        <TouchableOpacity style={styles.optionButton} onPress={() => router.push('/editar-perfil')}>
+          <Text style={styles.optionButtonText}>Editar Perfil</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount} disabled={isLoading}>
+          <Text style={styles.deleteAccountButtonText}>Eliminar Cuenta</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -388,12 +441,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  deleteAccountButton: {
+    backgroundColor: '#d32f2f',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#b71c1c',
+  },
+  deleteAccountButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   logoutButton: {
     backgroundColor: '#f44336',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
   },
   logoutButtonText: {
     color: 'white',

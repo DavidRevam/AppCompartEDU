@@ -37,16 +37,23 @@ export interface Imagen {
 
 export interface Solicitud {
   id: number;
-  cantidadSolicitud: number;
-  fechaSolicitud: string;
-  estadoSolicitud: EstadoSolicitud;
-  usuario: User;
-  publicacion: Publicacion;
+  // Campos del backend
+  cantidad: number;
+  fecha: string;
+  id_estado_solicitud: number;
+  id_usuario: number;
+  id_publicacion: number;
+  // Campos enriquecidos en el frontend
+  cantidadSolicitud?: number;
+  fechaSolicitud?: string;
+  estadoSolicitud?: EstadoSolicitud;
+  usuario?: User;
+  publicacion?: Publicacion;
 }
 
 export interface EstadoSolicitud {
   id: number;
-  descripcionEstado: string;
+  descripcion: string;
 }
 
 export interface Envio {

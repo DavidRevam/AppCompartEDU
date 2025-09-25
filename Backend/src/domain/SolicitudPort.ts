@@ -1,4 +1,19 @@
 import { Solicitud } from "./Solicitud";
+import { User } from "./User";
+import { Publicacion } from "./Publicacion";
+import { EstadoSolicitud } from "./EstadoSolicitud";
+
+export interface SolicitudCompleta {
+    id: number;
+    cantidad: number;
+    fecha: Date;
+    id_estado_solicitud: number;
+    id_usuario: number;
+    id_publicacion: number;
+    usuario?: User;
+    publicacion?: Publicacion;
+    estadoSolicitud?: EstadoSolicitud;
+}
 
 export interface SolicitudPort {
     createSolicitud(solicitud: Omit<Solicitud, "id">): Promise<number>;
@@ -10,6 +25,10 @@ export interface SolicitudPort {
     getSolicitudesByUsuario(id_usuario: number): Promise<Solicitud[]>;
     getSolicitudesByPublicacion(id_publicacion: number): Promise<Solicitud[]>;
     getSolicitudesByEstado(id_estado_solicitud: number): Promise<Solicitud[]>;
+    getSolicitudesByPublicacionesDelUsuario(id_usuario: number): Promise<Solicitud[]>;
+    getSolicitudesCompletasByPublicacionesDelUsuario(id_usuario: number): Promise<SolicitudCompleta[]>;
     // Método para cambiar estado de solicitud (aceptar, rechazar, etc.)
     cambiarEstadoSolicitud(id: number, nuevo_estado: number): Promise<boolean>;
+    // Cancelar todas las solicitudes de un usuario (eliminado lógico)
+    cancelarSolicitudesByUsuario(id_usuario: number): Promise<boolean>;
 }

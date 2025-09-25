@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicacionService } from '@/services/publicacionService';
 import { Publicacion } from '@/types';
+import { SolicitudModal } from '@/components/SolicitudModal';
 
 /**
  * LÓGICA DE STOCK SIMPLIFICADA:
@@ -33,6 +34,7 @@ export default function DetallesPublicacion() {
   const [publicacion, setPublicacion] = useState<Publicacion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const publicacionId = params.id as string;
 
@@ -97,15 +99,12 @@ export default function DetallesPublicacion() {
 
     if (!publicacion) return;
 
-    // Por ahora solo mostrar un alert, la funcionalidad se implementará después
-    Alert.alert(
-      'Solicitud de Material',
-      `¿Deseas solicitar "${publicacion.titulo}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Solicitar', onPress: () => console.log('Solicitud enviada') }
-      ]
-    );
+    setModalVisible(true);
+  };
+
+  const handleSolicitudSuccess = () => {
+    // Recargar los detalles de la publicación para actualizar el stock
+    loadPublicacionDetails();
   };
 
   const handleVolver = () => {
@@ -257,6 +256,20 @@ export default function DetallesPublicacion() {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Modal de Solicitud */}
+      {publicacion && (
+        <SolicitudModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          publicacion={{
+            id: publicacion.id,
+            titulo: publicacion.titulo,
+            cantidadDisponible: publicacion.stock?.cantidadDisponible || 0,
+          }}
+          onSuccess={handleSolicitudSuccess}
+        />
+      )}
     </View>
   );
 }

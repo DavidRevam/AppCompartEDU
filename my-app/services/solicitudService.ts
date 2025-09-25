@@ -26,12 +26,21 @@ export class SolicitudService {
 
   // Crear nueva solicitud
   static async createSolicitud(solicitudData: {
-    cantidad_solicitud: number;
+    cantidad: number;
     id_usuario: number;
     id_publicacion: number;
-  }): Promise<{ message: string; data: { id_solicitud: number } }> {
+  }): Promise<{ success: boolean; message: string; data: { id: number } }> {
     try {
-      const response = await api.post('/solicitudes', solicitudData);
+      // Preparar datos según la estructura esperada por el backend
+      const requestData = {
+        cantidad: solicitudData.cantidad,
+        fecha: new Date().toISOString().split('T')[0], // Fecha actual en formato YYYY-MM-DD
+        id_estado_solicitud: 1, // Estado "Pendiente" por defecto
+        id_usuario: solicitudData.id_usuario,
+        id_publicacion: solicitudData.id_publicacion
+      };
+
+      const response = await api.post('/solicitudes', requestData);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Error al crear solicitud');
@@ -133,6 +142,17 @@ export class SolicitudService {
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Error al cancelar solicitud');
+    }
+  }
+
+  // Obtener solicitudes hechas a las publicaciones del usuario
+  static async getSolicitudesByPublicacionesDelUsuario(userId: number): Promise<Solicitud[]> {
+    try {
+      const response = await api.get(`/solicitudes/mis-publicaciones/${userId}`);
+      // El backend devuelve { success: true, message: "...", data: [...] }
+      return response.data.data || [];
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener solicitudes de mis publicaciones');
     }
   }
 }

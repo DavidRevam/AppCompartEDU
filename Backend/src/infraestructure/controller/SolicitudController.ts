@@ -405,6 +405,36 @@ export class SolicitudController {
     }
 
     /**
+     * Obtener solicitudes hechas a publicaciones del usuario logueado
+     */
+    async getSolicitudesByPublicacionesDelUsuario(req: Request, res: Response): Promise<void> {
+        try {
+            const id_usuario = parseInt(req.params.id_usuario);
+            
+            if (isNaN(id_usuario)) {
+                res.status(400).json({
+                    success: false,
+                    message: "ID de usuario inválido"
+                });
+                return;
+            }
+
+            const solicitudes = await this.solicitudApplication.getSolicitudesByPublicacionesDelUsuario(id_usuario);
+            res.status(200).json({
+                success: true,
+                message: "Solicitudes obtenidas exitosamente",
+                data: solicitudes
+            });
+        } catch (error) {
+            console.error("Error en controlador al obtener solicitudes por publicaciones del usuario:", error);
+            res.status(500).json({
+                success: false,
+                message: "Error interno del servidor"
+            });
+        }
+    }
+
+    /**
      * Cancelar una solicitud
      */
     async cancelarSolicitud(req: Request, res: Response): Promise<void> {

@@ -79,7 +79,7 @@ export default function HomeScreen() {
     try {
       await SolicitudService.createSolicitud({
         id_publicacion: selectedPublicacion.id,
-        cantidad_solicitud: cantidad,
+        cantidad: cantidad,
         id_usuario: user.id,
       });
 

@@ -3,17 +3,20 @@ import { UserPort } from "../domain/UserPort";
 import bcrypt from "bcryptjs";
 import { AuthApplication } from "./AuthApplication";
 import { PublicacionPort } from "../domain/PublicacionPort";
+import { SolicitudPort } from "../domain/SolicitudPort";
 
 
 
 export class UserApplication {
     private port: UserPort;
     private publicacionPort: PublicacionPort;
+    private solicitudPort: SolicitudPort;
     //inyeccion constructor
 
-    constructor(port: UserPort, publicacionPort: PublicacionPort) {
+    constructor(port: UserPort, publicacionPort: PublicacionPort, solicitudPort: SolicitudPort) {
         this.port = port;
         this.publicacionPort = publicacionPort;
+        this.solicitudPort = solicitudPort;
 
     }
 
@@ -90,6 +93,8 @@ export class UserApplication {
         // 2. También desactivar publicaciones del usuario (lógica de negocio: estado_publi_activa = 0)
         if (result) {
             await this.publicacionPort.updatePublicacionesByUserId(id, { publicacion_activo: 0 });
+            // 3. Cancelar todas las solicitudes del usuario (lógica de negocio: estado = Cancelada)
+            await this.solicitudPort.cancelarSolicitudesByUsuario(id);
         }
 
         return result;
