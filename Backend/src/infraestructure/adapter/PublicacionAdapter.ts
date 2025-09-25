@@ -22,6 +22,15 @@ export class PublicacionAdapter implements PublicacionPort {
             fecha: publi.fecha_publicacion,
             publicacion_activo: publi.estado_publi_activa, // 1 = activo, 0 = inactivo
             id_usuario: publi.usuario.id_usuario,
+            usuario: publi.usuario ? {
+                id: publi.usuario.id_usuario,
+                nombre: publi.usuario.nombre_usuario,
+                apellido: publi.usuario.apellido_usuario,
+                telefono: publi.usuario.telefono_usuario,
+                password: publi.usuario.password_usuario,
+                email: publi.usuario.email_usuario,
+                usuario_activo: publi.usuario.estado_usu_activo
+            } : undefined
         }
     }
 
@@ -95,7 +104,10 @@ export class PublicacionAdapter implements PublicacionPort {
 
     async getAllPublicaciones(): Promise<Publicacion[]> {
         try {
-            const publicaciones = await this.publicacionRepository.find({ relations: ["usuario"] });
+            const publicaciones = await this.publicacionRepository.find({ 
+                where: { estado_publi_activa: 1 }, // Solo publicaciones activas
+                relations: ["usuario"] 
+            });
             return publicaciones.map(this.toDomain);
         } catch (error) {
             console.error("Error al obtener todas las publicaciones", error);
@@ -116,7 +128,11 @@ export class PublicacionAdapter implements PublicacionPort {
     async getPublicacionByUserId(id_usuario: number): Promise<Publicacion[]> {
         try {
             const publicaciones = await this.publicacionRepository.find({
-                where: { usuario: { id_usuario } }, relations: ["usuario"]
+                where: { 
+                    usuario: { id_usuario },
+                    estado_publi_activa: 1 // Solo publicaciones activas
+                }, 
+                relations: ["usuario"]
             });
 
             return publicaciones.map(this.toDomain);

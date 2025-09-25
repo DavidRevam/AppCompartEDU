@@ -64,12 +64,32 @@ export class PublicacionApplication{
         }
     }
 
-    async updatePublicacion(id: number, publi: Partial<Publicacion>): Promise<boolean>{
+    async updatePublicacion(id: number, publi: Partial<Publicacion>, cantidadTotal?: number): Promise<boolean>{
         const existingPublicacion = await this.port.getPublicacionById(id);
         if(!existingPublicacion){
             throw new Error ("La publicacion no existe, no se puede editar");
         }
-        return this.port.updatePublicacion(id, publi);
+
+        // Actualizar la publicación
+        const publicacionUpdated = await this.port.updatePublicacion(id, publi);
+        
+        // Si se proporciona cantidadTotal, actualizar el stock
+        if (cantidadTotal !== undefined && cantidadTotal !== null) {
+            const existingStock = await this.stockPort.getStockByPublicacionId(id);
+            if (existingStock) {
+                // Calcular la nueva cantidad disponible manteniendo las reservadas
+                const cantidadDisponible = cantidadTotal - existingStock.cantidadReservada;
+                
+                const stockUpdated = await this.stockPort.updateStock(existingStock.id, {
+                    cantidadTotal: cantidadTotal,
+                    cantidadDisponible: cantidadDisponible >= 0 ? cantidadDisponible : 0
+                });
+                
+                return publicacionUpdated && stockUpdated;
+            }
+        }
+        
+        return publicacionUpdated;
     }
 
     async deletePublicacion(id: number): Promise<boolean>{

@@ -66,7 +66,6 @@ router.put("/publicaciones/:id", authenticateToken, async (req: Request, res: Re
   }
 });
 
-//"BORRADO LOGICO"
 router.delete("/publicaciones/:id", authenticateToken, async (req: Request, res: Response) => {
   try {
     await publicacionController.deletePublicacion(req, res);

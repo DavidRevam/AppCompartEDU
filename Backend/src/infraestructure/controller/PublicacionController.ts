@@ -124,13 +124,13 @@ export class PublicacionController {
       const id = parseInt(req.params.id);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
 
-      const { titulo, descripcion, publicacion_activo } = req.body;
+      const { titulo, descripcion, publicacion_activo, cantidadTotal } = req.body;
 
       const updated = await this.app.updatePublicacion(id, {
         titulo,
         descripcion,
         publicacion_activo,
-      });
+      }, cantidadTotal);
 
       if (!updated) {
         return res.status(404).json({ error: "Publicación no encontrada" });
